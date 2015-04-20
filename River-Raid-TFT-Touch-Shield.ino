@@ -111,14 +111,14 @@ char chopter_b[73] =
 "01110000";
 
 char boat[129] =
-"0000001100000000"
-"0000001100000000"
-"0000111100000000"
-"0011111111000000"
-"3333333333333333"
-"3333333333333300"
-"2222222222220000"
-"0022222222220000";
+"0000005500000000"
+"0000005500000000"
+"0000555500000000"
+"0055555555000000"
+"4444444444444444"
+"4444444444444400"
+"6666666666660000"
+"0066666666660000";
 
 char fuel[204] =
 "0444440"
@@ -191,6 +191,8 @@ void loop() {
     draw_sprite(plane_x, plane_y, plane_straight, PLANE_SIZE, PLANE_ROW_SIZE);
   }
 
+  // fuel test
+  draw_sprite(fuel_0_x, fuel_0_y, fuel, 204, 7);
 
   // missile update
   update_missile();
@@ -330,8 +332,6 @@ void update_enemies()
     draw_sprite(chopter_0_x, chopter_0_y, chopter_b, 73, 8);
   }
   
-  // fuel test
-  draw_sprite(fuel_0_x, fuel_0_y, fuel, 204, 7);
   
   // boat test
   
