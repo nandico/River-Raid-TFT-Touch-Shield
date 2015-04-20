@@ -28,6 +28,9 @@ int chopter_0_y = 100;
 int chopter_0_dir = 1;
 int fuel_0_x = 30;
 int fuel_0_y = 30;
+int boat_0_x = 200;
+int boat_0_y = 200;
+int boat_0_dir = -1;
 
 int clock = 0;
 
@@ -329,5 +332,17 @@ void update_enemies()
   
   // fuel test
   draw_sprite(fuel_0_x, fuel_0_y, fuel, 204, 7);
+  
+  // boat test
+  
+  boat_0_x += boat_0_dir;
+  
+  if(boat_0_x < 10  || boat_0_x >= SCREEN_X - 10 )
+  {
+    boat_0_dir *= -1;
+  }
+  
+  clear_sprite(boat_0_x -2, boat_0_y, BLACK, 150, 20);
+  draw_sprite(boat_0_x, boat_0_y, boat, 129, 16);
   
 }
