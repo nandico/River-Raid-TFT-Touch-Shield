@@ -5,18 +5,18 @@
 #include <Math.h>
 
 // additional color constants
-#define CYAN2		0x08ff
+//#define CYAN2		0x07ff
 
 #define PLANE_X_VEL       2
 #define PLANE_ROW_SIZE    7
-#define PLANE_SIZE        63
+#define PLANE_SIZE        64
 
 #define MISSILE_Y_VEL     3
 #define MISSILE_Y_TAIL    8
 
-unsigned int colors[11] = {BLACK, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, CYAN2, BRIGHT_RED, GRAY1, GRAY2};
+unsigned int colors[10] = {BLACK, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, BRIGHT_RED, GRAY1, GRAY2};
 
-char plane_straight[PLANE_SIZE + 1] = "0001000"
+char plane_straight[PLANE_SIZE] = "0001000"
                           "0001000"
                           "0011100"
                           "0111110"
@@ -26,7 +26,7 @@ char plane_straight[PLANE_SIZE + 1] = "0001000"
                           "0011100"
                           "0101010";                          
 
-char plane_right[PLANE_SIZE + 1] =    "0001000"
+char plane_right[PLANE_SIZE] =    "0001000"
                           "0001000"
                           "0011000"
                           "0111100"
@@ -36,7 +36,7 @@ char plane_right[PLANE_SIZE + 1] =    "0001000"
                           "0101100"
                           "0000010";
 
-char plane_left[PLANE_SIZE + 1] =     "0001000"
+char plane_left[PLANE_SIZE] =     "0001000"
                           "0001000"
                           "0001100"
                           "0011110"
@@ -46,7 +46,7 @@ char plane_left[PLANE_SIZE + 1] =     "0001000"
                           "0011010"
                           "0100000";
                           
-char plane_off[PLANE_SIZE + 1] =      "0000000"
+char plane_off[PLANE_SIZE] =      "0000000"
                           "0000000"
                           "0000000"
                           "0000000"
@@ -58,10 +58,10 @@ char plane_off[PLANE_SIZE + 1] =      "0000000"
 
 char plane_enemy[49] =    "00000006"
                           "06600066"
-                          "77777777"
-                          "77770077"
-                          "00077700"
-                          "00007700";                          
+                          "55555555"
+                          "55550055"
+                          "00055500"
+                          "00005500";                          
 
 int plane_x = 116;
 int plane_y = 280;
@@ -110,6 +110,8 @@ void loop() {
   }
 
 
+  draw_sprite(100, 100, plane_enemy, 49, 8);
+
   if(missile_y < -MISSILE_Y_TAIL)
   {
     fire_missile();
@@ -130,7 +132,7 @@ void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
   column = 0;
   line = 0;
   
-  for(int i = 0; i < spriteSize; i ++)
+  for(int i = 0; i < (spriteSize - 1); i ++)
   {
     colorId = (int) sprite[i] - '0';   
     color = colors[colorId];
