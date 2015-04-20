@@ -23,6 +23,9 @@ int missile_y = -1;
 int missile_x = 0;
 int enemy_plane_x = 320;
 int enemy_plane_y = 100;
+int chopter_0_x = 100;
+int chopter_0_y = 100;
+int chopter_0_dir = 1;
 
 int clock = 0;
 
@@ -78,7 +81,70 @@ char plane_enemy[49] =
 "55555555"
 "55550055"
 "00055500"
-"00005500";                          
+"00005500";
+
+char chopter_a[73] =
+"00444000"
+"44400000"
+"00400000"
+"01110000"
+"11111001"
+"22222222"
+"01110001"
+"00100000"
+"01110000";
+
+char chopter_b[73] =
+"44400000"
+"00444000"
+"00400000"
+"01110000"
+"11111001"
+"22222222"
+"01110001"
+"00100000"
+"01110000";
+
+char boat[129] =
+"0000001100000000"
+"0000001100000000"
+"0000111100000000"
+"0011111111000000"
+"3333333333333333"
+"3333333333333300"
+"2222222222220000"
+"0022222222220000";
+
+char fuel[204] =
+"0444440"
+"4411144"
+"4414444"
+"4414444"
+"4411144"
+"4414444"
+"4444444"
+"6666666"
+"6616166"
+"6616166"
+"6616166"
+"6616166"
+"6611166"
+"6666666"
+"4444444"
+"4411144"
+"4414444"
+"4411444"
+"4414444"
+"4411144"
+"4444444"
+"6666666"
+"6616666"
+"6616666"
+"6616666"
+"6616666"
+"6611166"
+"6666666"
+"6666666";
 
 TouchScreen ts = TouchScreen(XP, YP, XM, YM); //init TouchScreen port pins
 
@@ -224,8 +290,7 @@ void update_missile()
 
 void update_enemies()
 {
-  //draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);  
-  //clear_sprite(int x, int y, unsigned int color, int spriteSize, int rowSize)
+  // plane test
   if(enemy_plane_x < -10)
   {
     enemy_plane_x = SCREEN_X;
@@ -239,4 +304,24 @@ void update_enemies()
   clear_sprite(enemy_plane_x, enemy_plane_y - 2, BLACK, 60, 10);
   enemy_plane_x -= 1;
   draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);
+  
+  // chopter test
+  
+  chopter_0_x += chopter_0_dir;
+  
+  if(chopter_0_x < 10  || chopter_0_x >= SCREEN_X - 10 )
+  {
+    chopter_0_dir *= -1;
+  }
+  
+  if(clock % 2 == 0)
+  {
+    clear_sprite(chopter_0_x -2, chopter_0_y, BLACK, 110, 12);
+    draw_sprite(chopter_0_x, chopter_0_y, chopter_a, 73, 8);
+  }
+  else
+  {
+    clear_sprite(chopter_0_x -2, chopter_0_y, BLACK, 110, 12);
+    draw_sprite(chopter_0_x, chopter_0_y, chopter_b, 73, 8);
+  }
 }
