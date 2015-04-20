@@ -4,26 +4,19 @@
 #include <SPI.h>
 #include <Math.h>
 
-/*
-#define RED		0xf800
-#define GREEN	0x07e0
-#define BLUE	0x001f
-#define BLACK	0x0000
-#define YELLOW	0xffe0
-#define WHITE	0xffff
-
-//Other Colors
-#define CYAN		0x07ff	
-#define BRIGHT_RED	0xf810	
-#define GRAY1		0x8410  
-#define GRAY2		0x4208 
-*/
-
+// additional color constants
 #define CYAN2		0x08ff
+
+#define PLANE_X_VEL       2
+#define PLANE_ROW_SIZE    7
+#define PLANE_SIZE        63
+
+#define MISSILE_Y_VEL     3
+#define MISSILE_Y_TAIL    8
 
 unsigned int colors[11] = {BLACK, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, CYAN2, BRIGHT_RED, GRAY1, GRAY2};
 
-char plane_straight[64] = "0001000"
+char plane_straight[PLANE_SIZE + 1] = "0001000"
                           "0001000"
                           "0011100"
                           "0111110"
@@ -33,7 +26,7 @@ char plane_straight[64] = "0001000"
                           "0011100"
                           "0101010";                          
 
-char plane_right[64] =    "0001000"
+char plane_right[PLANE_SIZE + 1] =    "0001000"
                           "0001000"
                           "0011000"
                           "0111100"
@@ -43,7 +36,7 @@ char plane_right[64] =    "0001000"
                           "0101100"
                           "0000010";
 
-char plane_left[64] =     "0001000"
+char plane_left[PLANE_SIZE + 1] =     "0001000"
                           "0001000"
                           "0001100"
                           "0011110"
@@ -53,7 +46,7 @@ char plane_left[64] =     "0001000"
                           "0011010"
                           "0100000";
                           
-char plane_off[64] =      "0000000"
+char plane_off[PLANE_SIZE + 1] =      "0000000"
                           "0000000"
                           "0000000"
                           "0000000"
@@ -75,9 +68,7 @@ int plane_y = 280;
 int missile_y = -1;
 int missile_x = 0;
 
-#define PLANE_X_VEL       2
-#define MISSILE_Y_VEL     3
-#define MISSILE_Y_TAIL    8
+
 
 TouchScreen ts = TouchScreen(XP, YP, XM, YM); //init TouchScreen port pins
 
@@ -91,11 +82,7 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   
-  // test plane
-  //draw_plane(random(0,240), random(0,320), plane_straight);
-
   // manage input
   Point p = ts.getPoint();
   
@@ -106,20 +93,20 @@ void loop() {
   {
     if(p.x < 120)
     {
-      draw_plane(plane_x, plane_y, plane_off);
+      draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
       plane_x -=PLANE_X_VEL;
-      draw_plane(plane_x, plane_y, plane_left);
+      draw_sprite(plane_x, plane_y, plane_left, PLANE_SIZE, PLANE_ROW_SIZE);
     }
     else
     {
-      draw_plane(plane_x, plane_y, plane_off);
+      draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
       plane_x +=PLANE_X_VEL;
-      draw_plane(plane_x, plane_y, plane_right);
+      draw_sprite(plane_x, plane_y, plane_right, PLANE_SIZE, PLANE_ROW_SIZE);
     }
   }
   else
   {
-    draw_plane(plane_x, plane_y, plane_straight);
+    draw_sprite(plane_x, plane_y, plane_straight, PLANE_SIZE, PLANE_ROW_SIZE);
   }
 
 
@@ -132,7 +119,7 @@ void loop() {
 
 }
 
-void draw_plane(int x, int y, char plane[])
+void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
 {
   int colorId;
   unsigned int color;
@@ -143,12 +130,12 @@ void draw_plane(int x, int y, char plane[])
   column = 0;
   line = 0;
   
-  for(int i = 0; i < 63; i ++)
+  for(int i = 0; i < spriteSize; i ++)
   {
-    colorId = (int) plane[i] - '0';   
+    colorId = (int) sprite[i] - '0';   
     color = colors[colorId];
   
-    if(i > 0 && i % 7 == 0)
+    if(i > 0 && i % rowSize == 0)
     {
       line++;
       column = 0;
@@ -185,7 +172,6 @@ void fire_missile()
 void update_missile()
 {
   missile_y -= MISSILE_Y_VEL;
-  // missile_x = plane_x; // follow missile
   draw_missile(missile_x, missile_y);
   
   Serial.println(missile_y);
