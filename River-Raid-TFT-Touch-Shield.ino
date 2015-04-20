@@ -7,6 +7,9 @@
 // additional color constants
 //#define CYAN2		0x07ff
 
+#define SCREEN_X          240
+#define SCREEN_Y          320
+
 #define PLANE_X_VEL       2
 #define PLANE_ROW_SIZE    7
 #define PLANE_SIZE        64
@@ -14,61 +17,68 @@
 #define MISSILE_Y_VEL     3
 #define MISSILE_Y_TAIL    8
 
-unsigned int colors[10] = {BLACK, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, BRIGHT_RED, GRAY1, GRAY2};
-
-char plane_straight[PLANE_SIZE] = "0001000"
-                          "0001000"
-                          "0011100"
-                          "0111110"
-                          "1111111"
-                          "1101011"
-                          "1001001"
-                          "0011100"
-                          "0101010";                          
-
-char plane_right[PLANE_SIZE] =    "0001000"
-                          "0001000"
-                          "0011000"
-                          "0111100"
-                          "0101110"
-                          "0001010"
-                          "0011000"
-                          "0101100"
-                          "0000010";
-
-char plane_left[PLANE_SIZE] =     "0001000"
-                          "0001000"
-                          "0001100"
-                          "0011110"
-                          "0111010"
-                          "0101000"
-                          "0001100"
-                          "0011010"
-                          "0100000";
-                          
-char plane_off[PLANE_SIZE] =      "0000000"
-                          "0000000"
-                          "0000000"
-                          "0000000"
-                          "0000000"
-                          "0000000"
-                          "0000000"
-                          "0000000"
-                          "0000000";
-
-char plane_enemy[49] =    "00000006"
-                          "06600066"
-                          "55555555"
-                          "55550055"
-                          "00055500"
-                          "00005500";                          
-
 int plane_x = 116;
 int plane_y = 280;
 int missile_y = -1;
 int missile_x = 0;
+int enemy_plane_x = 320;
+int enemy_plane_y = 100;
 
+int clock = 0;
 
+unsigned int colors[10] = {BLACK, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, BRIGHT_RED, GRAY1, GRAY2};
+
+char plane_straight[PLANE_SIZE] = 
+"0001000"
+"0001000"
+"0011100"
+"0111110"
+"1111111"
+"1101011"
+"1001001"
+"0011100"
+"0101010";                          
+
+char plane_right[PLANE_SIZE] =
+"0001000"
+"0001000"
+"0011000"
+"0111100"
+"0101110"
+"0001010"
+"0011000"
+"0101100"
+"0000010";
+
+char plane_left[PLANE_SIZE] =
+"0001000"
+"0001000"
+"0001100"
+"0011110"
+"0111010"
+"0101000"
+"0001100"
+"0011010"
+"0100000";
+                          
+char plane_off[PLANE_SIZE] =
+"0000000"
+"0000000"
+"0000000"
+"0000000"
+"0000000"
+"0000000"
+"0000000"
+"0000000"
+"0000000";
+
+char plane_enemy[49] =
+"00000006"
+"06600066"
+"55555555"
+"55550055"
+"00055500"
+"00005500";                          
 
 TouchScreen ts = TouchScreen(XP, YP, XM, YM); //init TouchScreen port pins
 
@@ -76,8 +86,6 @@ void setup() {
 
   Tft.TFTinit();  //init TFT library
   Serial.begin(115200);
-  
-
 
 }
 
@@ -93,32 +101,34 @@ void loop() {
   {
     if(p.x < 120)
     {
-      draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
+      //draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
+      clear_sprite(plane_x, plane_y, BLACK, PLANE_SIZE, PLANE_ROW_SIZE);
       plane_x -=PLANE_X_VEL;
       draw_sprite(plane_x, plane_y, plane_left, PLANE_SIZE, PLANE_ROW_SIZE);
     }
     else
     {
-      draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
+      //draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
+      clear_sprite(plane_x, plane_y, BLACK, PLANE_SIZE, PLANE_ROW_SIZE);
       plane_x +=PLANE_X_VEL;
       draw_sprite(plane_x, plane_y, plane_right, PLANE_SIZE, PLANE_ROW_SIZE);
     }
   }
   else
   {
+    //clear_sprite(plane_x, plane_y, BLACK, PLANE_SIZE, PLANE_ROW_SIZE);
     draw_sprite(plane_x, plane_y, plane_straight, PLANE_SIZE, PLANE_ROW_SIZE);
   }
 
 
-  draw_sprite(100, 100, plane_enemy, 49, 8);
-
-  if(missile_y < -MISSILE_Y_TAIL)
-  {
-    fire_missile();
-  }
-  
+  // missile update
   update_missile();
 
+  // enemies update
+  update_enemies();
+  
+  // clock update
+  clock ++;
 }
 
 void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
@@ -143,9 +153,38 @@ void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
       column = 0;
     }
     column ++;
+  
+    if(check_boundaries(column + x, line + y))
+    {  
+      Tft.setPixel(column + x, line + y, color);
+    }
+  }
+}
+
+bool check_boundaries(int x, int y)
+{
+  return (x > 0 && x < SCREEN_X) && (y > 0 && y < SCREEN_Y);
+}
+
+void clear_sprite(int x, int y, unsigned int color, int spriteSize, int rowSize)
+{
+  int column;
+  int line;
+  
+  column = 0;
+  line = 0;
+  
+  for(int i = 0; i < (spriteSize - 1); i ++)
+  { 
+    if(i > 0 && i % rowSize == 0)
+    {
+      line++;
+      column = 0;
+    }
+    column ++;
     
     Tft.setPixel(column + x, line + y, color);
-  }
+  }  
 }
 
 void draw_missile(int x, int y)
@@ -173,8 +212,31 @@ void fire_missile()
 
 void update_missile()
 {
+  if(missile_y < -MISSILE_Y_TAIL)
+  {
+    fire_missile();
+  }
+
   missile_y -= MISSILE_Y_VEL;
   draw_missile(missile_x, missile_y);
   
-  Serial.println(missile_y);
+}
+
+void update_enemies()
+{
+  //draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);  
+  //clear_sprite(int x, int y, unsigned int color, int spriteSize, int rowSize)
+  if(enemy_plane_x < -10)
+  {
+    enemy_plane_x = SCREEN_X;
+  }
+  
+  if(clock % 30 == 0)
+  {
+    enemy_plane_y ++;
+  }
+  
+  clear_sprite(enemy_plane_x, enemy_plane_y - 2, BLACK, 60, 10);
+  enemy_plane_x -= 1;
+  draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);
 }
