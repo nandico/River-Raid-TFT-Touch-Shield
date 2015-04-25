@@ -6,9 +6,14 @@
 
 // additional color constants
 //#define CYAN2		0x07ff
+#define RIVER_COLOR     0x001f
+#define SOIL_COLOR      0x07e0
 
 #define SCREEN_X          240
 #define SCREEN_Y          320
+
+#define SOIL_WIDTH        60
+#define SEA_WIDTH         120
 
 #define PLANE_X_VEL       2
 #define PLANE_ROW_SIZE    7
@@ -158,6 +163,7 @@ void setup() {
   Tft.TFTinit();  //init TFT library
   Serial.begin(115200);
 
+  draw_sea();
 }
 
 void loop() {
@@ -202,6 +208,13 @@ void loop() {
   
   // clock update
   clock ++;
+}
+
+void draw_sea()
+{
+  Tft.fillRectangle(0, 0, SOIL_WIDTH, SCREEN_Y, SOIL_COLOR);
+  Tft.fillRectangle(SOIL_WIDTH, 0, SEA_WIDTH, SCREEN_Y, RIVER_COLOR);
+  Tft.fillRectangle(SOIL_WIDTH + SEA_WIDTH, 0, SOIL_WIDTH, SCREEN_Y, SOIL_COLOR);
 }
 
 void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
@@ -308,11 +321,12 @@ void update_enemies()
     enemy_plane_y ++;
   }
   
-  clear_sprite(enemy_plane_x, enemy_plane_y - 2, BLACK, 60, 10);
-  enemy_plane_x -= 1;
-  draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);
-  
-  // chopter test
+  if(clock % 2 == 0 )
+  {
+    clear_sprite(enemy_plane_x, enemy_plane_y - 2, BLACK, 60, 10);
+    enemy_plane_x -= 1;
+    draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);
+  }
   
   chopter_0_x += chopter_0_dir;
   
@@ -320,13 +334,13 @@ void update_enemies()
   {
     chopter_0_dir *= -1;
   }
-  
-  if(clock % 2 == 0)
+
+  if(clock % 4 == 0)
   {
     clear_sprite(chopter_0_x -2, chopter_0_y, BLACK, 110, 12);
     draw_sprite(chopter_0_x, chopter_0_y, chopter_a, 73, 8);
   }
-  else
+  else if(clock % 4 == 2)
   {
     clear_sprite(chopter_0_x -2, chopter_0_y, BLACK, 110, 12);
     draw_sprite(chopter_0_x, chopter_0_y, chopter_b, 73, 8);
@@ -342,7 +356,9 @@ void update_enemies()
     boat_0_dir *= -1;
   }
   
-  clear_sprite(boat_0_x -2, boat_0_y, BLACK, 150, 20);
-  draw_sprite(boat_0_x, boat_0_y, boat, 129, 16);
-  
+  if(clock % 2 == 1)
+  {
+    clear_sprite(boat_0_x -2, boat_0_y, BLACK, 150, 20);
+    draw_sprite(boat_0_x, boat_0_y, boat, 129, 16);
+  }
 }
