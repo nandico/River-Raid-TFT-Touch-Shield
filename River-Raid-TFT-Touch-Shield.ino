@@ -31,15 +31,15 @@ int enemy_plane_y = 100;
 int chopter_0_x = 100;
 int chopter_0_y = 100;
 int chopter_0_dir = 1;
-int fuel_0_x = 30;
+int fuel_0_x = 90;
 int fuel_0_y = 30;
-int boat_0_x = 200;
+int boat_0_x = 100;
 int boat_0_y = 200;
 int boat_0_dir = -1;
 
 int clock = 0;
 
-unsigned int colors[10] = {BLACK, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, BRIGHT_RED, GRAY1, GRAY2};
+unsigned int colors[12] = {RIVER_COLOR, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, GRAY1, BLACK, SOIL_COLOR};
 
 char plane_straight[PLANE_SIZE] = 
 "0001000"
@@ -94,32 +94,32 @@ char plane_enemy[49] =
 "00005500";
 
 char chopter_a[73] =
-"00444000"
-"44400000"
-"00400000"
-"01110000"
-"11111001"
-"22222222"
-"01110001"
+"00111000"
+"11100000"
 "00100000"
-"01110000";
+"08880000"
+"88888008"
+"77777777"
+"08880008"
+"00800000"
+"08880000";
 
 char chopter_b[73] =
-"44400000"
-"00444000"
-"00400000"
-"01110000"
-"11111001"
-"22222222"
-"01110001"
+"11100000"
+"00111000"
 "00100000"
-"01110000";
+"08880000"
+"88888008"
+"77777777"
+"08880008"
+"00800000"
+"08880000";
 
 char boat[129] =
-"0000005500000000"
-"0000005500000000"
-"0000555500000000"
-"0055555555000000"
+"0000008800000000"
+"0000008800000000"
+"0000888800000000"
+"0088888888000000"
 "4444444444444444"
 "4444444444444400"
 "6666666666660000"
@@ -178,15 +178,13 @@ void loop() {
   {
     if(p.x < 120)
     {
-      //draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
-      clear_sprite(plane_x, plane_y, BLACK, PLANE_SIZE, PLANE_ROW_SIZE);
+      clear_sprite(plane_x, plane_y, RIVER_COLOR, PLANE_SIZE, PLANE_ROW_SIZE);
       plane_x -=PLANE_X_VEL;
       draw_sprite(plane_x, plane_y, plane_left, PLANE_SIZE, PLANE_ROW_SIZE);
     }
     else
     {
-      //draw_sprite(plane_x, plane_y, plane_off, PLANE_SIZE, PLANE_ROW_SIZE);
-      clear_sprite(plane_x, plane_y, BLACK, PLANE_SIZE, PLANE_ROW_SIZE);
+      clear_sprite(plane_x, plane_y, RIVER_COLOR, PLANE_SIZE, PLANE_ROW_SIZE);
       plane_x +=PLANE_X_VEL;
       draw_sprite(plane_x, plane_y, plane_right, PLANE_SIZE, PLANE_ROW_SIZE);
     }
@@ -280,7 +278,7 @@ void draw_missile(int x, int y)
   
   for(int i = 0; i < MISSILE_Y_TAIL * 2; i ++)
   {
-    color = (i < MISSILE_Y_TAIL) ? YELLOW: BLACK;
+    color = (i < MISSILE_Y_TAIL) ? YELLOW: RIVER_COLOR;
     if(tail > 0)
     {
       Tft.setPixel(x, tail, color);  
@@ -323,26 +321,26 @@ void update_enemies()
   
   if(clock % 2 == 0 )
   {
-    clear_sprite(enemy_plane_x, enemy_plane_y - 2, BLACK, 60, 10);
+    clear_sprite(enemy_plane_x, enemy_plane_y - 2, RIVER_COLOR, 60, 10);
     enemy_plane_x -= 1;
     draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);
   }
   
   chopter_0_x += chopter_0_dir;
   
-  if(chopter_0_x < 10  || chopter_0_x >= SCREEN_X - 10 )
+  if(chopter_0_x < SOIL_WIDTH + 3  || chopter_0_x >= SCREEN_X - SOIL_WIDTH - 10 )
   {
     chopter_0_dir *= -1;
   }
 
   if(clock % 4 == 0)
   {
-    clear_sprite(chopter_0_x -2, chopter_0_y, BLACK, 110, 12);
+    clear_sprite(chopter_0_x -2, chopter_0_y, RIVER_COLOR, 110, 12);
     draw_sprite(chopter_0_x, chopter_0_y, chopter_a, 73, 8);
   }
   else if(clock % 4 == 2)
   {
-    clear_sprite(chopter_0_x -2, chopter_0_y, BLACK, 110, 12);
+    clear_sprite(chopter_0_x -2, chopter_0_y, RIVER_COLOR, 110, 12);
     draw_sprite(chopter_0_x, chopter_0_y, chopter_b, 73, 8);
   }
   
@@ -351,14 +349,14 @@ void update_enemies()
   
   boat_0_x += boat_0_dir;
   
-  if(boat_0_x < 10  || boat_0_x >= SCREEN_X - 10 )
+  if(boat_0_x < SOIL_WIDTH + 3  || boat_0_x >= SCREEN_X - SOIL_WIDTH - 20 )
   {
     boat_0_dir *= -1;
   }
   
   if(clock % 2 == 1)
   {
-    clear_sprite(boat_0_x -2, boat_0_y, BLACK, 150, 20);
+    clear_sprite(boat_0_x -2, boat_0_y, RIVER_COLOR, 150, 20);
     draw_sprite(boat_0_x, boat_0_y, boat, 129, 16);
   }
 }
