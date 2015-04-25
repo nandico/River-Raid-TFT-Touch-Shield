@@ -13,7 +13,7 @@
 #define SCREEN_Y          320
 
 #define SOIL_WIDTH        60
-#define SEA_WIDTH         120
+#define RIVER_WIDTH         120
 
 #define PLANE_X_VEL       2
 #define PLANE_ROW_SIZE    7
@@ -39,7 +39,7 @@ int boat_0_dir = -1;
 
 int clock = 0;
 
-unsigned int colors[12] = {RIVER_COLOR, YELLOW, BLUE, GREEN, RED, WHITE, CYAN, GRAY1, BLACK, SOIL_COLOR};
+unsigned int colors[12] = {RIVER_COLOR, YELLOW, BLUE, 99, RED, WHITE, CYAN, GRAY1, BLACK, SOIL_COLOR};
 
 char plane_straight[PLANE_SIZE] = 
 "0001000"
@@ -86,12 +86,12 @@ char plane_off[PLANE_SIZE] =
 "0000000";
 
 char plane_enemy[49] =
-"00000006"
-"06600066"
+"33333336"
+"36633366"
 "55555555"
-"55550055"
-"00055500"
-"00005500";
+"55553355"
+"33355533"
+"33335533";
 
 char chopter_a[73] =
 "00111000"
@@ -211,8 +211,8 @@ void loop() {
 void draw_sea()
 {
   Tft.fillRectangle(0, 0, SOIL_WIDTH, SCREEN_Y, SOIL_COLOR);
-  Tft.fillRectangle(SOIL_WIDTH, 0, SEA_WIDTH, SCREEN_Y, RIVER_COLOR);
-  Tft.fillRectangle(SOIL_WIDTH + SEA_WIDTH, 0, SOIL_WIDTH, SCREEN_Y, SOIL_COLOR);
+  Tft.fillRectangle(SOIL_WIDTH, 0, RIVER_WIDTH, SCREEN_Y, RIVER_COLOR);
+  Tft.fillRectangle(SOIL_WIDTH + RIVER_WIDTH, 0, SOIL_WIDTH, SCREEN_Y, SOIL_COLOR);
 }
 
 void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
@@ -222,6 +222,7 @@ void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
   
   int column;
   int line;
+  int target_x;
   
   column = 0;
   line = 0;
@@ -239,8 +240,21 @@ void draw_sprite(int x, int y, char sprite[], int spriteSize, int rowSize)
     column ++;
   
     if(check_boundaries(column + x, line + y))
-    {  
-      Tft.setPixel(column + x, line + y, color);
+    {
+      if(color != 99)
+      {  
+        Tft.setPixel(column + x, line + y, color);
+      }
+      else
+      {
+        color = RIVER_COLOR;
+        target_x = column + x; 
+        if(target_x < SOIL_WIDTH || target_x > RIVER_WIDTH + SOIL_WIDTH)
+        {
+          color = SOIL_COLOR;
+        }
+        Tft.setPixel(target_x, line + y, color);        
+      }
     }
   }
 }
@@ -255,6 +269,8 @@ void clear_sprite(int x, int y, unsigned int color, int spriteSize, int rowSize)
   int column;
   int line;
   
+  int target_x;
+  
   column = 0;
   line = 0;
   
@@ -267,7 +283,20 @@ void clear_sprite(int x, int y, unsigned int color, int spriteSize, int rowSize)
     }
     column ++;
     
-    Tft.setPixel(column + x, line + y, color);
+    if(color != 99)
+    {
+      Tft.setPixel(column + x, line + y, color);
+    }
+    else
+    {
+      color = RIVER_COLOR;
+      target_x = column + x; 
+      if(target_x < SOIL_WIDTH || target_x > RIVER_WIDTH + SOIL_WIDTH)
+      {
+        color = SOIL_COLOR;
+      }
+      Tft.setPixel(target_x, line + y, color);
+    }
   }  
 }
 
@@ -321,7 +350,7 @@ void update_enemies()
   
   if(clock % 2 == 0 )
   {
-    clear_sprite(enemy_plane_x, enemy_plane_y - 2, RIVER_COLOR, 60, 10);
+    clear_sprite(enemy_plane_x, enemy_plane_y - 2, 99, 60, 10);
     enemy_plane_x -= 1;
     draw_sprite(enemy_plane_x, enemy_plane_y, plane_enemy, 49, 8);
   }
