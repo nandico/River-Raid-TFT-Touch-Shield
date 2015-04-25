@@ -12,6 +12,8 @@
 #define SCREEN_X          240
 #define SCREEN_Y          320
 
+#define SCROLL_VEL        0;
+
 #define SOIL_WIDTH        60
 #define RIVER_WIDTH         120
 
@@ -195,9 +197,6 @@ void loop() {
     draw_sprite(plane_x, plane_y, plane_straight, PLANE_SIZE, PLANE_ROW_SIZE);
   }
 
-  // fuel test
-  draw_sprite(fuel_0_x, fuel_0_y, fuel, 204, 7);
-
   // missile update
   update_missile();
 
@@ -373,6 +372,9 @@ void update_enemies()
     draw_sprite(chopter_0_x, chopter_0_y, chopter_b, 73, 8);
   }
   
+  // fuel test
+  draw_sprite(fuel_0_x, fuel_0_y, fuel, 204, 7);
+  fuel_0_y += SCROLL_VEL;
   
   // boat test
   
